@@ -81,6 +81,9 @@ class RichText extends \humhub\components\Widget
 
         // create image tag for emojis
         $this->text = self::translateEmojis($this->text, ($this->minimal) ? false : true);
+        
+        // HASHTAGS
+        $this->text = self::convertHashtags($this->text, ($this->minimal) ? false : true);
 
         if ($this->maxLength != 0) {
             $this->text = \humhub\libs\Helpers::truncateText($this->text, $this->maxLength);
@@ -155,5 +158,17 @@ class RichText extends \humhub\components\Widget
             return $hit[0];
         }, $text);
     }
+    
+	public static function convertHashtags($text)
+	{
+	// Temporary solution to hashtags
+    return preg_replace_callback(
+        '/(\#([A-Za-z1-9_]+))/',
+        function( $hit ) {
+			$hash = str_replace('#','', $hit[1]);
+            return '<a href="/search/search/index?keyword='. strtolower($hash) .'&scope=content">'
+                . $hit[0] .'</a>';
+        }, $text);
+	}
 
 }
